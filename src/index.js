@@ -1,6 +1,6 @@
-import MarketData from './MarketData.js';
-import Portfolio from './Portfolio.js';
-import Websocket from './Websocket.js';
+const MarketData = require('./MarketData/MarketData.js');
+const Portfolio = require('./Portfolio/Portfolio.js');
+const Websocket = require('./Websocket/Websocket.js');
 
 /**
  * Main class defining the high level functions and members. Functions similarly to Alpaca
@@ -36,7 +36,7 @@ class Backtest {
   /**
    * Create an order through the portfolio
    *
-   * @param {string} options.symbol - The ticker/symbol for the order
+   * @param {string} options.symbol - The symbol for the order
    * @param {number} options.qty - Quantity of the order
    * @param {string} options.side - 'buy' or 'sell'
    * @param {string} options.type - currently only supports 'market'
@@ -58,4 +58,4 @@ class Backtest {
   }
 };
 
-export default Backtest;
+module.exports = Backtest;
