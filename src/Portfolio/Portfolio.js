@@ -1,6 +1,6 @@
-import _ from 'lodash';
+const _ = require('lodash');
 
-import Position from './Position.js';
+const Position = require('../Position/Position.js');
 
 /**
  * A class representing cash and all of the positions taken
@@ -48,7 +48,7 @@ class Portfolio {
   /**
    * Create an order
    *
-   * @param {string} options.symbol - The ticker/symbol for the order
+   * @param {string} options.symbol - The symbol for the order
    * @param {number} options.qty - Quantity of the order
    * @param {string} options.side - 'buy' or 'sell'
    * @param {string} options.type - currently only supports 'market'
@@ -61,7 +61,7 @@ class Portfolio {
       throw new Error('No symbol provided for order.');
     }
     if (!options.qty || options.qty < 1) {
-      throw new Error('Quantity must be >= 1 to create an order');
+      throw new Error('Quantity must be >= 1 to create an order.');
     }
     if (!options.side || (options.side !== 'sell' && options.side !== 'buy')) {
       throw new Error('Side not provided correctly. Must be buy or sell.');
@@ -126,4 +126,4 @@ class Portfolio {
   }
 }
 
-export default Portfolio;
+module.exports = Portfolio;

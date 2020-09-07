@@ -1,4 +1,4 @@
-import _ from 'lodash';
+const _ = require('lodash');
 
 /**
  * Websocket class mirroring Alpaca's and implementing its functionality for backtesting
@@ -64,7 +64,7 @@ class Websocket {
     const rawChannels = _.map(this.channels, (channel) => {
       const isMinute = channel.startsWith('AM.');
       if (!isMinute) {
-        throw new Error('We only support minute aggregates at this time');
+        throw new Error('Only minute aggregates are supported at this time.');
       }
 
       return channel.substring(3);
@@ -117,4 +117,4 @@ class Websocket {
   }
 }
 
-export default Websocket;
+module.exports = Websocket;

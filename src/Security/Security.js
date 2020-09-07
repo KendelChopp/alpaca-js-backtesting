@@ -2,11 +2,11 @@
  * Underlying class tracking the price of a Security
  */
 class Security {
-  constructor(ticker, data) {
-    this.ticker = ticker;
+  constructor(symbol, data) {
+    this.symbol = symbol;
     this.price = 0;
     this.data = data;
   }
 }
 
-export default Security;
+module.exports = Security;

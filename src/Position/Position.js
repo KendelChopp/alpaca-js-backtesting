@@ -14,4 +14,4 @@ class Position {
   }
 }
 
-export default Position;
+module.exports = Position;

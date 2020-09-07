@@ -1,6 +1,6 @@
-import _ from 'lodash';
+const _ = require('lodash');
 
-import Security from './Security.js';
+const Security = require('../Security/Security.js');
 
 /**
  * Class tracking market data and time for all relevant securities
@@ -18,12 +18,12 @@ class MarketData {
   /**
    * Adds security with data from Alpaca data
    *
-   * @param {string} ticker - the ticker for the security
+   * @param {string} symbol - the symbol for the security
    * @param {Object[]} data - The array of data points from Alpaca
    */
-  addSecurity(ticker, data) {
+  addSecurity(symbol, data) {
     // TODO: Convert data to a separate class to ensure it is structured
-    this.securities[ticker] = new Security(ticker, data);
+    this.securities[symbol] = new Security(symbol, data);
     this.maxTime = Math.max(data.length, this.maxTime);
   }
 
@@ -40,7 +40,7 @@ class MarketData {
       return {
         ...security.data[this.time],
         ev: 'AM',
-        sym: security.ticker
+        sym: security.symbol
       }
     });
 
@@ -58,15 +58,15 @@ class MarketData {
   }
 
   /**
-   * Gets the current price of a security based on the ticker
+   * Gets the current price of a security based on the symbol
    *
-   * @param {string} ticker - the ticker for the security
+   * @param {string} symbol - the symbol for the security
    * @returns {number} the value of the security
    */
-  getPrice(ticker) {
-    const security = this.securities[ticker];
+  getPrice(symbol) {
+    const security = this.securities[symbol];
     return security.price;
   }
 }
 
-export default MarketData;
+module.exports = MarketData;
