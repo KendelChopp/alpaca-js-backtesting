@@ -12,7 +12,11 @@
     "url": "git+https://github.com/KendelChopp/alpaca-js-backtesting.git"
   },
   "author": "Kendel Chopp",
-  "license": "ISC",
+  "license": "MIT",
+  "keywords": [
+    "alpaca",
+    "backtesting"
+  ],
   "bugs": {
     "url": "https://github.com/KendelChopp/alpaca-js-backtesting/issues"
   },
