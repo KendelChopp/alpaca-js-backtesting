@@ -54,7 +54,7 @@ describe('Websocket', () => {
       let barRequest, channels, channelString, rawChannels;
 
       beforeEach(() => {
-        channels = ['AM.SPY', 'AM.AAPL'];
+        channels = ['AM.SPY', 'alpacadatav1/AM.AAPL'];
         rawChannels = ['SPY', 'AAPL'];
         channelString = 'SPY,AAPL';
         websocket.channels = channels;
@@ -130,14 +130,20 @@ describe('Websocket', () => {
           return minuteCount++ < 1;
         });
 
-        simulatedMinute = { some: 'minute' };
+        simulatedMinute = [{
+          subject: 'AM.AAPL',
+          data: {
+            some: 'data'
+          }
+        }];
+
         jest.spyOn(marketData, 'simulateMinute').mockReturnValue(simulatedMinute);
       });
 
       test('calls the callback the correct number of times', () => {
         websocket.runSimulation();
         expect(marketData.simulateMinute).toBeCalled();
-        expect(callback).toBeCalledWith('AM', simulatedMinute);
+        expect(callback).toBeCalledWith(simulatedMinute[0].subject, simulatedMinute[0].data);
       });
     });
 

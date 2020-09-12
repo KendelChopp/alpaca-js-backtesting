@@ -79,13 +79,16 @@ describe('MarketData', () => {
       expect(marketData.time).toBe(1);
     });
 
-    test('returns a stringified map of the valid securities', () => {
+    test('returns a map of the valid securities with subject and data', () => {
       const simulation = marketData.simulateMinute();
-      const expected = JSON.stringify([{
-        closePrice,
-        ev: 'AM',
-        sym: validSecurity.symbol
-      }]);
+      const expected = [{
+        subject: `AM.${validSecurity.symbol}`,
+        data: {
+          closePrice,
+          ev: 'AM',
+          symbol: validSecurity.symbol
+        }
+      }];
 
       expect(simulation).toEqual(expected);
     });

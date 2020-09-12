@@ -62,12 +62,13 @@ class Websocket {
    */
   async loadData() {
     const rawChannels = _.map(this.channels, (channel) => {
+      const isV1Minute = channel.startsWith('alpacadatav1/AM.');
       const isMinute = channel.startsWith('AM.');
-      if (!isMinute) {
+      if (!isMinute && !isV1Minute) {
         throw new Error('Only minute aggregates are supported at this time.');
       }
 
-      return channel.substring(3);
+      return isMinute ? channel.substring(3) : channel.substring(16);
     });
 
     const channelString = _.join(rawChannels, ',');
@@ -96,7 +97,10 @@ class Websocket {
     }
 
     while (this._marketData.hasData) {
-      this.stockAggMinCallback('AM', this._marketData.simulateMinute());
+      const simulatedSecurities = this._marketData.simulateMinute();
+      _.forEach(simulatedSecurities, (security) => {
+        this.stockAggMinCallback(security.subject, security.data);
+      });
     }
   }
 
