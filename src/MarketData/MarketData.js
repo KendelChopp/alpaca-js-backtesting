@@ -31,21 +31,24 @@ class MarketData {
    * Simulates a minute by mapping the security's information for that minute and updating the
    * current price of all the securities
    *
-   * @returns {string} the stringified map of information to simulate coming over a request
+   * @returns {Object[]} object containing subjects and data
    */
   simulateMinute() {
     const validSecurities = _.filter(this.securities, (security) => Boolean(security.data[this.time]));
     const dataMap = _.map(validSecurities, (security) => {
       security.price = security.data[this.time].closePrice;
       return {
-        ...security.data[this.time],
-        ev: 'AM',
-        sym: security.symbol
-      }
+        subject: `AM.${security.symbol}`,
+        data: {
+          ...security.data[this.time],
+          ev: 'AM',
+          symbol: security.symbol
+        }
+      };
     });
 
     this.time++;
-    return JSON.stringify(dataMap);
+    return dataMap;
   }
 
   /**

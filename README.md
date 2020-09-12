@@ -36,7 +36,7 @@ const backtest = new Backtest({
 });
 ```
 
-3. Run your algorithm replacing Alpaca/websockets accordingly. 
+3. Run your algorithm replacing Alpaca/websockets accordingly.
 
 For example (commented out lines are the old lines to be replaced):
 ```JavaScript
@@ -61,6 +61,10 @@ This table lists the version of @kendelchopp/alpaca-js-backtesting with the vers
 | @kendelchopp/alpaca-js-backtesting | @alpacahq/alpaca-trade-api-js |
 | ---------------------------------- | ----------------------------- |
 | 1.0.0                              | 1.4.1                         |
+| 1.1.0                              | 1.4.1                         |
+| 1.1.1                              | 1.4.1                         |
+| 1.1.2                              | 1.4.1                         |
+| 1.1.3                              | 1.4.1                         |
 
 ## Relevant Functions
 ### Backtest#createOrder
@@ -99,7 +103,7 @@ Runs a function when establishing the connection. When backtesting, you will usu
 #### Example
 ```JavaScript
 client.onConnect(() => {
-  client.subscribe(['AM.SPY']);
+  client.subscribe(['alpacadatav1/AM.SPY']);
 });
 ```
 
@@ -114,14 +118,12 @@ client.onDisconnect(() => {
 ```
 
 ### Websocket#onStockAggMin
-This runs your function when a simulated minute occurrs and returns the relevant data. This is where your trading will likely take place
+This runs your function when a simulated minute occurrs and returns the relevant data. This is where your trading will likely take place. Subject will look something like `AM.SPY` and data will look like a standard bar data.
 
 #### Example
 ```JavaScript
 client.onStockAggMin((subject, data) => {
-  const priceArray = JSON.parse(data);
-  
-  if (priceArray[0].closePrice < 500) {
+  if (data.closePrice < 500) {
     backtest.createOrder({
       symbol: 'SPY',
       qty: 300,
@@ -129,7 +131,7 @@ client.onStockAggMin((subject, data) => {
       type: 'market',
       time_in_force: 'day'
     });
-    
+
     console.log('Bought SPY');
   }
 });
@@ -141,6 +143,6 @@ Subscribes to the channels listed. Currently, only aggregate minute channels are
 #### Example
 ```JavaScript
 client.onConnect(() => {
-  client.subscribe(['AM.SPY', 'AM.AAPL']);
+  client.subscribe(['alpacadatav1/AM.SPY', 'alpacadatav1/AM.AAPL']);
 });
 ```
