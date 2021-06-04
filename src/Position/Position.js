@@ -8,7 +8,7 @@ class Position {
    * @param {string} symbol - The symbol for the position
    * @param {number} quantity - The number open
    */
-  constructor(symbol, quantity=0) {
+  constructor(symbol, quantity = 0) {
     this.symbol = symbol;
     this.quantity = quantity;
   }

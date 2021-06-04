@@ -1,6 +1,6 @@
-const _ = require('lodash');
+const _ = require("lodash");
 
-const Position = require('../Position/Position.js');
+const Position = require("../Position/Position.js");
 
 /**
  * A class representing cash and all of the positions taken
@@ -26,7 +26,7 @@ class Portfolio {
    * @returns {Position} The position represented by the symbol if it exists
    */
   getPosition(symbol) {
-    return _.find(this.positions, (position) => (position.symbol === symbol));
+    return _.find(this.positions, position => position.symbol === symbol);
   }
 
   /**
@@ -58,34 +58,34 @@ class Portfolio {
    */
   createOrder(options) {
     if (!options.symbol) {
-      throw new Error('No symbol provided for order.');
+      throw new Error("No symbol provided for order.");
     }
     if (!options.qty || options.qty < 1) {
-      throw new Error('Quantity must be >= 1 to create an order.');
+      throw new Error("Quantity must be >= 1 to create an order.");
     }
-    if (!options.side || (options.side !== 'sell' && options.side !== 'buy')) {
-      throw new Error('Side not provided correctly. Must be buy or sell.');
+    if (!options.side || (options.side !== "sell" && options.side !== "buy")) {
+      throw new Error("Side not provided correctly. Must be buy or sell.");
     }
 
     const currentPrice = this.marketData.getPrice(options.symbol);
 
-    if (options.side === 'sell') {
+    if (options.side === "sell") {
       const position = this.getPosition(options.symbol);
       if (position && position.quantity >= options.qty) {
         this.cash += options.qty * currentPrice;
         position.quantity -= options.qty;
 
         if (position.quantity == 0) {
-          _.remove(this.positions, (position) => (position.quantity == 0));
+          _.remove(this.positions, position => position.quantity == 0);
         }
       } else {
         // TODO: improve warning handling here
-        console.warn('Attempted to sell more of a position than in portfolio');
+        console.warn("Attempted to sell more of a position than in portfolio");
       }
     } else {
       if (this.cash < options.qty * currentPrice) {
         // TODO: improve warning handling here
-        console.warn('Order not executed, not enough cash');
+        console.warn("Order not executed, not enough cash");
       } else {
         const position = this.findOrCreatePosition(options.symbol);
         this.cash -= options.qty * currentPrice;
@@ -100,7 +100,7 @@ class Portfolio {
    * @returns {number} The total value of the Portfolio
    */
   getValue() {
-    const positionValue = _.sumBy(this.positions, (position) => {
+    const positionValue = _.sumBy(this.positions, position => {
       const price = this.marketData.getPrice(position.symbol);
 
       return price * position.quantity;
@@ -116,13 +116,13 @@ class Portfolio {
    */
   getStats() {
     const endValue = this.getValue();
-    const roi = (endValue / this.startValue) - 1;
+    const roi = endValue / this.startValue - 1;
 
     return {
       startValue: this.startValue,
       endValue,
       roi
-    }
+    };
   }
 }
 
