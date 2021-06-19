@@ -30,7 +30,12 @@ class Backtest {
 
     this._marketData = new MarketData();
     this._portfolio = new Portfolio(startValue, this._marketData);
-    this.data_ws = new Websocket(alpaca, this._marketData, startDate, endDate);
+    this.data_stream_v2 = new Websocket(
+      alpaca,
+      this._marketData,
+      startDate,
+      endDate
+    );
   }
 
   /**

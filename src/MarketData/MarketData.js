@@ -38,13 +38,13 @@ class MarketData {
       Boolean(security.data[this.time])
     );
     const dataMap = _.map(validSecurities, security => {
-      security.price = security.data[this.time].closePrice;
+      security.price = security.data[this.time].ClosePrice;
       return {
         subject: `AM.${security.symbol}`,
         data: {
           ...security.data[this.time],
           ev: "AM",
-          symbol: security.symbol
+          Symbol: security.symbol
         }
       };
     });

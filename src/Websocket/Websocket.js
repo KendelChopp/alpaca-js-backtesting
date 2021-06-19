@@ -40,29 +40,38 @@ class Websocket {
   }
 
   /**
+   * Sets up a callback for when a connection error occurs (in development)
+   *
+   * @param {Function} errorCallback - The callback after a connection error occurs
+   */
+  onError(errorCallback) {
+    this.errorCallback = errorCallback;
+  }
+
+  /**
    * Sets up a callback for when an aggregate minute channel updates. This is usually where
    * opening and closing of positions will occurr
    *
    * @param {Function} stockAggMinCallback - The callback when receiving an AM channel update
    */
-  onStockAggMin(stockAggMinCallback) {
+  onStockBar(stockAggMinCallback) {
     this.stockAggMinCallback = stockAggMinCallback;
   }
 
   /**
    * Subscribe to some number of channels
-   * Currently supports AM.* channels
+   * Currently supports AM.* channels (no need to add AM. prefix)
    *
    * @param {string[]} channels - The channels to subscribe to
    */
-  subscribe(channels) {
+  subscribeForBars(channels) {
     this.channels = channels;
   }
 
   /* Loops through all stocks and get market data from specified data provider
    * If a TWELVEDATA_API_KEY key is available then market data will be pulled from Twelvedata API
    * */
-  async getStocksData(stocks, provider) {
+  async getStockData(stocks, provider) {
     let stockData = {};
     let stockIndex = 0;
     let stockRequestBuffer = [];
@@ -95,7 +104,7 @@ class Websocket {
       await Promise.all(stockRequestBuffer).then(data => {
         stockData[data[0].stock] = _.orderBy(
           data[0].values,
-          ["startEpochTime"],
+          ["Timestamp"],
           ["asc"]
         );
       });
@@ -133,15 +142,13 @@ class Websocket {
                 stock: stock,
                 values: _.map(response.data.values, value => {
                   return {
-                    startEpochTime: moment
-                      .tz(value.datetime, "America/New_York")
-                      .unix()
-                      .valueOf(),
-                    openPrice: parseFloat(value.open),
-                    highPrice: parseFloat(value.high),
-                    lowPrice: parseFloat(value.low),
-                    closePrice: parseFloat(value.close),
-                    volume: parseInt(value.volume)
+                    Symbol: stock,
+                    Timestamp: value.datetime,
+                    OpenPrice: parseFloat(value.open),
+                    HighPrice: parseFloat(value.high),
+                    LowPrice: parseFloat(value.low),
+                    ClosePrice: parseFloat(value.close),
+                    Volume: parseInt(value.volume)
                   };
                 })
               };
@@ -207,15 +214,13 @@ class Websocket {
             stock: stock,
             values: _.map(barset, value => {
               return {
-                startEpochTime: moment
-                  .tz(value.Timestamp, "America/New_York")
-                  .unix()
-                  .valueOf(),
-                openPrice: parseFloat(value.OpenPrice),
-                highPrice: parseFloat(value.HighPrice),
-                lowPrice: parseFloat(value.LowPrice),
-                closePrice: parseFloat(value.ClosePrice),
-                volume: parseInt(value.Volume)
+                Symbol: stock,
+                Timestamp: value.Timestamp,
+                OpenPrice: parseFloat(value.OpenPrice),
+                HighPrice: parseFloat(value.HighPrice),
+                LowPrice: parseFloat(value.LowPrice),
+                ClosePrice: parseFloat(value.ClosePrice),
+                Volume: parseInt(value.Volume)
               };
             })
           };
@@ -231,23 +236,13 @@ class Websocket {
   }
 
   /**
-   * Reads in the historical data from alpaca using `alpaca.getBars`
+   * Reads in the historical data from alpaca using `alpaca.getBarsV2` (WIP)
    */
   async loadData() {
-    const rawChannels = _.map(this.channels, channel => {
-      const isV1Minute = channel.startsWith("alpacadatav1/AM.");
-      const isMinute = channel.startsWith("AM.");
-      if (!isMinute && !isV1Minute) {
-        throw new Error("Only minute aggregates are supported at this time.");
-      }
+    const channelData = await this.getStockData(this.channels, this);
 
-      return isMinute ? channel.substring(3) : channel.substring(16);
-    });
-
-    const channelData = await this.getStocksData(rawChannels, this);
-
-    _.forEach(rawChannels, channel => {
-      this._marketData.addSecurity(channel, channelData[channel]);
+    _.forOwn(channelData, (data, channel) => {
+      this._marketData.addSecurity(channel, data);
     });
   }
 
@@ -263,7 +258,7 @@ class Websocket {
     while (this._marketData.hasData) {
       const simulatedSecurities = this._marketData.simulateMinute();
       _.forEach(simulatedSecurities, security => {
-        this.stockAggMinCallback(security.subject, security.data);
+        this.stockAggMinCallback(security.data);
       });
     }
   }
@@ -281,6 +276,10 @@ class Websocket {
 
     if (this.disconnectCallback) {
       this.disconnectCallback();
+    }
+
+    if (this.errorCallback) {
+      this.errorCallback();
     }
   }
 }
