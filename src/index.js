@@ -1,6 +1,6 @@
-const MarketData = require('./MarketData/MarketData.js');
-const Portfolio = require('./Portfolio/Portfolio.js');
-const Websocket = require('./Websocket/Websocket.js');
+const MarketData = require("./MarketData/MarketData.js");
+const Portfolio = require("./Portfolio/Portfolio.js");
+const Websocket = require("./Websocket/Websocket.js");
 
 /**
  * Main class defining the high level functions and members. Functions similarly to Alpaca
@@ -17,20 +17,25 @@ class Backtest {
    */
   constructor({ alpaca, startValue = 100000, startDate, endDate } = {}) {
     if (!alpaca) {
-      throw new Error('Missing alpaca object');
+      throw new Error("Missing alpaca object");
     }
 
     if (!startDate) {
-      throw new Error('You must provide a start date');
+      throw new Error("You must provide a start date");
     }
 
     if (!endDate) {
-      throw new Error('You must provide an end date');
+      throw new Error("You must provide an end date");
     }
 
     this._marketData = new MarketData();
     this._portfolio = new Portfolio(startValue, this._marketData);
-    this.data_ws = new Websocket(alpaca, this._marketData, startDate, endDate);
+    this.data_stream_v2 = new Websocket(
+      alpaca,
+      this._marketData,
+      startDate,
+      endDate
+    );
   }
 
   /**
@@ -56,6 +61,6 @@ class Backtest {
   getStats() {
     return this._portfolio.getStats();
   }
-};
+}
 
 module.exports = Backtest;

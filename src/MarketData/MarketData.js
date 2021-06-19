@@ -1,6 +1,6 @@
-const _ = require('lodash');
+const _ = require("lodash");
 
-const Security = require('../Security/Security.js');
+const Security = require("../Security/Security.js");
 
 /**
  * Class tracking market data and time for all relevant securities
@@ -34,15 +34,17 @@ class MarketData {
    * @returns {Object[]} object containing subjects and data
    */
   simulateMinute() {
-    const validSecurities = _.filter(this.securities, (security) => Boolean(security.data[this.time]));
-    const dataMap = _.map(validSecurities, (security) => {
-      security.price = security.data[this.time].closePrice;
+    const validSecurities = _.filter(this.securities, security =>
+      Boolean(security.data[this.time])
+    );
+    const dataMap = _.map(validSecurities, security => {
+      security.price = security.data[this.time].ClosePrice;
       return {
         subject: `AM.${security.symbol}`,
         data: {
           ...security.data[this.time],
-          ev: 'AM',
-          symbol: security.symbol
+          ev: "AM",
+          Symbol: security.symbol
         }
       };
     });

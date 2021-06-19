@@ -1,29 +1,29 @@
-const Security = require('../Security/Security.js');
+const Security = require("../Security/Security.js");
 
-const MarketData = require('./MarketData.js');
+const MarketData = require("./MarketData.js");
 
-describe('MarketData', () => {
+describe("MarketData", () => {
   let marketData;
 
   beforeEach(() => {
     marketData = new MarketData();
   });
 
-  test('sets the correct defaults', () => {
+  test("sets the correct defaults", () => {
     expect(marketData.maxTime).toBe(0);
     expect(marketData.time).toBe(0);
     expect(marketData.securities).toEqual({});
   });
 
-  describe('addSecurity', () => {
+  describe("addSecurity", () => {
     let data, symbol;
 
     beforeEach(() => {
-      data = [{ some: 'data' }, { some: 'other data' }];
-      symbol = 'AAPL';
+      data = [{ some: "data" }, { some: "other data" }];
+      symbol = "AAPL";
     });
 
-    test('adds a new security', () => {
+    test("adds a new security", () => {
       marketData.addSecurity(symbol, data);
       const newSecurity = marketData.securities[symbol];
       expect(newSecurity).toBeInstanceOf(Security);
@@ -31,18 +31,18 @@ describe('MarketData', () => {
       expect(newSecurity.symbol).toBe(symbol);
     });
 
-    describe('when max time is less than data.length', () => {
+    describe("when max time is less than data.length", () => {
       beforeEach(() => {
         marketData.maxTime = 0;
       });
 
-      test('sets maxTime to data.length', () => {
+      test("sets maxTime to data.length", () => {
         marketData.addSecurity(symbol, data);
         expect(marketData.maxTime).toBe(data.length);
       });
     });
 
-    describe('when max time is less than data.length', () => {
+    describe("when max time is less than data.length", () => {
       let maxTime;
 
       beforeEach(() => {
@@ -50,69 +50,71 @@ describe('MarketData', () => {
         marketData.maxTime = maxTime;
       });
 
-      test('does not change maxTime', () => {
+      test("does not change maxTime", () => {
         marketData.addSecurity(symbol, data);
         expect(marketData.maxTime).toBe(maxTime);
       });
     });
   });
 
-  describe('simulateMinute', () => {
+  describe("simulateMinute", () => {
     let closePrice, validSecurity, invalidSecurity;
 
     beforeEach(() => {
       closePrice = 123;
-      validSecurity = new Security('SPY', [{ closePrice }]);
-      invalidSecurity = new Security('AAPL', []);
+      validSecurity = new Security("SPY", [{ closePrice }]);
+      invalidSecurity = new Security("AAPL", []);
 
       marketData.securities = [validSecurity, invalidSecurity];
       marketData.time = 0;
     });
 
-    test('updates the valid security price', () => {
+    test("updates the valid security price", () => {
       marketData.simulateMinute();
       expect(validSecurity.price).toBe(closePrice);
     });
 
-    test('adds one to the current time', () => {
+    test("adds one to the current time", () => {
       marketData.simulateMinute();
       expect(marketData.time).toBe(1);
     });
 
-    test('returns a map of the valid securities with subject and data', () => {
+    test("returns a map of the valid securities with subject and data", () => {
       const simulation = marketData.simulateMinute();
-      const expected = [{
-        subject: `AM.${validSecurity.symbol}`,
-        data: {
-          closePrice,
-          ev: 'AM',
-          symbol: validSecurity.symbol
+      const expected = [
+        {
+          subject: `AM.${validSecurity.symbol}`,
+          data: {
+            closePrice,
+            ev: "AM",
+            symbol: validSecurity.symbol
+          }
         }
-      }];
+      ];
 
       expect(simulation).toEqual(expected);
     });
   });
 
-  describe('hasData', () => {
-    describe('when time is less than maxTime', () => {
-      test('returns true', () => {
+  describe("hasData", () => {
+    describe("when time is less than maxTime", () => {
+      test("returns true", () => {
         marketData.time = 0;
         marketData.maxTime = 1;
         expect(marketData.hasData).toBe(true);
       });
     });
 
-    describe('when time is equal to maxTime', () => {
-      test('returns false', () => {
+    describe("when time is equal to maxTime", () => {
+      test("returns false", () => {
         marketData.time = 1;
         marketData.maxTime = 1;
         expect(marketData.hasData).toBe(false);
       });
     });
 
-    describe('when time is greater than maxTime', () => {
-      test('returns false', () => {
+    describe("when time is greater than maxTime", () => {
+      test("returns false", () => {
         marketData.time = 2;
         marketData.maxTime = 1;
         expect(marketData.hasData).toBe(false);
@@ -120,18 +122,18 @@ describe('MarketData', () => {
     });
   });
 
-  describe('getPrice', () => {
+  describe("getPrice", () => {
     let price, symbol;
 
     beforeEach(() => {
-      symbol = 'AAPL';
+      symbol = "AAPL";
       price = 12;
       const security = new Security(symbol, []);
       security.price = price;
       marketData.securities = { [symbol]: security };
     });
 
-    test('returns the price of the requested security', () => {
+    test("returns the price of the requested security", () => {
       expect(marketData.getPrice(symbol)).toBe(price);
     });
   });
